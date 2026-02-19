@@ -67,9 +67,7 @@ btn.dataset.real = icon;
         btn.addEventListener("click", () => flip(btn));
         board.appendChild(btn);
       });
-    }
-
-    function flip(card){
+    }function flip(card){
   if(lock) return;
 
   // si déjà retournée (pas "?"), on ne fait rien
@@ -82,6 +80,32 @@ btn.dataset.real = icon;
     first = card;
     return;
   }
+
+  // 2e carte
+  moves++;
+  movesEl.textContent = String(moves);
+
+  if(first.dataset.real === card.dataset.real){
+    // paire trouvée -> on laisse visible
+    pairs++;
+    pairsEl.textContent = String(pairs);
+    first = null;
+
+    if(pairs === 8){
+      setTimeout(() => alert(`Bravo ! ${moves} coups.`), 150);
+    }
+  } else {
+    // pas pareil -> on remet "?" aux 2 cartes
+    lock = true;
+    const a = first;
+    setTimeout(() => {
+      a.textContent = "?";
+      card.textContent = "?";
+      first = null;
+      lock = false;
+    }, 600);
+  }
+}
 
   // 2e carte
   moves++;
