@@ -70,15 +70,44 @@ btn.dataset.real = icon;
     }
 
     function flip(card){
-      if(lock) return;
-      if(!card.classList.contains("hidden")) return;
+  if(lock) return;
 
-      card.classList.remove("hidden");
+  // si déjà retournée (pas "?"), on ne fait rien
+  if(card.textContent !== "?") return;
 
-      if(!first){
-        first = card;
-        return;
-      }
+  // on révèle la carte
+  card.textContent = card.dataset.real;
+
+  if(!first){
+    first = card;
+    return;
+  }
+
+  // 2e carte
+  moves++;
+  movesEl.textContent = String(moves);
+
+  if(first.dataset.real === card.dataset.real){
+    // paire trouvée -> on laisse visible
+    pairs++;
+    pairsEl.textContent = String(pairs);
+    first = null;
+
+    if(pairs === 8){
+      setTimeout(() => alert(`Bravo ! ${moves} coups.`), 150);
+    }
+  } else {
+    // pas pareil -> on remet "?" aux 2 cartes
+    lock = true;
+    const a = first;
+    setTimeout(() => {
+      a.textContent = "?";
+      card.textContent = "?";
+      first = null;
+      lock = false;
+    }, 600);
+  }
+}
 
       // 2e carte
       moves++;
