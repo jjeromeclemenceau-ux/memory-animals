@@ -1,11 +1,111 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="fr">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Memory Animals</title>
+
+  <style>
+    body{margin:0;font-family:system-ui,-apple-system,Arial;background:#0b1220;color:#e8eeff}
+    header{padding:16px;text-align:center;font-weight:900}
+    .board{max-width:520px;margin:0 auto;padding:12px;display:grid;gap:10px;grid-template-columns:repeat(4,1fr)}
+    button.card{aspect-ratio:1/1;border:0;border-radius:14px;background:rgba(255,255,255,.08);
+      color:#e8eeff;font-size:34px;display:grid;place-items:center}
+    .hidden{color:transparent}
+    .top{display:flex;justify-content:center;gap:12px;padding:0 16px 10px;color:#a8b3d6}
+    .pill{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);padding:8px 12px;border-radius:999px}
+  </style>
 </head>
+
 <body>
-  <h1>Mon premier jeu Memory 🐶🐱</h1>
-  <p>Le jeu arrive bientôt…</p>
+  <header>Memory Animals 🐶🐱</header>
+
+  <div class="top">
+    <div class="pill">Coups: <span id="moves">0</span></div>
+    <div class="pill">Paires: <span id="pairs">0</span>/8</div>
+  </div>
+
+  <main class="board" id="board"></main>
+
+  <script>
+    // 8 paires = 16 cartes
+    const icons = ["🐶","🐱","🦊","🐼","🐸","🦁","🐵","🐧"];
+    let deck = [];
+    let first = null;
+    let lock = false;
+    let moves = 0;
+    let pairs = 0;
+
+    const board = document.getElementById("board");
+    const movesEl = document.getElementById("moves");
+    const pairsEl = document.getElementById("pairs");
+
+    function shuffle(a){
+      for(let i=a.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [a[i],a[j]] = [a[j],a[i]];
+      }
+      return a;
+    }
+
+    function newGame(){
+      board.innerHTML = "";
+      deck = shuffle([...icons, ...icons]);
+      first = null; lock = false;
+      moves = 0; pairs = 0;
+      movesEl.textContent = "0";
+      pairsEl.textContent = "0";
+
+      deck.forEach((icon, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "card hidden";
+        btn.type = "button";
+        btn.dataset.icon = icon;
+        btn.dataset.idx = String(idx);
+        btn.textContent = icon; // caché via .hidden
+        btn.addEventListener("click", () => flip(btn));
+        board.appendChild(btn);
+      });
+    }
+
+    function flip(card){
+      if(lock) return;
+      if(!card.classList.contains("hidden")) return;
+
+      card.classList.remove("hidden");
+
+      if(!first){
+        first = card;
+        return;
+      }
+
+      // 2e carte
+      moves++;
+      movesEl.textContent = String(moves);
+
+      if(first.dataset.icon === card.dataset.icon){
+        // paire trouvée
+        pairs++;
+        pairsEl.textContent = String(pairs);
+        first = null;
+
+        if(pairs === 8){
+          setTimeout(() => alert(`Bravo ! ${moves} coups.`), 150);
+        }
+      } else {
+        // pas pareil -> on recache
+        lock = true;
+        const a = first;
+        setTimeout(() => {
+          a.classList.add("hidden");
+          card.classList.add("hidden");
+          first = null;
+          lock = false;
+        }, 600);
+      }
+    }
+
+    newGame();
+  </script>
 </body>
 </html>
